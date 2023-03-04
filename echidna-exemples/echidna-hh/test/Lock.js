@@ -2,7 +2,7 @@ const {
   time,
   loadFixture,
 } = require("@nomicfoundation/hardhat-network-helpers");
-const { anyValue } = require("../../../echidna-exemples/echidna-hh/node_modules/@nomicfoundation/hardhat-chai-matchers/withArgs");
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
 describe("Lock", function () {
