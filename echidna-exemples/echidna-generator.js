@@ -33,6 +33,7 @@ const geni = async (dir) => {
                     const outputPath = `${outputDir}/echidna_${dirName}.sol`
                     const sourceCode = generateCode(filename, contract, `${contract_path}/${filename}.sol`).toString().replace(/},/g, '}');
                     console.log({ outputPath, sourceCode });
+
                     await WriteJsFile(outputPath, sourceCode);
  
                 }
@@ -67,7 +68,7 @@ const generateCode = (name,contract,  path) => {
                 return data.name == "" ? "Key" : data.name;
             });
             const tempFunc = funcTemplate(item.name)
-
+await 
                 func.push(tempFunc)
 
            
