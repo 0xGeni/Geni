@@ -10,24 +10,29 @@ Geni is a builder tool that eases the writing of specifications of blockchain sm
 
 ## Installation
 
-```bash
-$ TBP
-```
+`npm install`
+`yarn install`
 
 ## Usage
 
 Geni uses OpenAI functionnalities to generate the best specifications possible. Thus, it needs to be configured with your account's secret key, which is available on the [website](https://beta.openai.com/account/api-keys).
+## How it works
+1. `npm i geni-generator`
+2. ` geni -f  hardhat -t echidna -d ./echidna-exemples/echidna-hh/artifacts/contracts/Lock.sol/`
+## Configuration
+1. your contract build directory ` '-d': '--dir'` 
+   2. framework used         `'-f': '--framework'`
+     3. generate specification/test for which tool       `'-t': '--tool'`
+       4. need help     `'-h': '--help'` 
+## framwork & tools Suported
+1. hardhat with echidna 
+2. foundry
+## Future work
+1. 
 
 ### Request options
 
 Here are the options you need to configure to run the tool.
 
 ## Tests
-
-### Test the generateEchidnaFunction.js
-
-The generation of Echidna specifications can be test with one specific function for instance :
-```bash
-$ node generateEchidnaFunctions.js "function add(uint256 a, uint256 b) public pure returns (uint256)"
-
-```
+TBA

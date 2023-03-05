@@ -2,7 +2,7 @@
   "name": "geni-generator",
   "version": "1.0.0",
   "description": "",
-  "main": "geni-generator.js",
+  "main": "index.js",
   "scripts": {
     "run": "echo \"Error: no test specified\" && exit 1"
   },
