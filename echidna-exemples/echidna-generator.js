@@ -4,8 +4,9 @@ var path = require("path");
 
 
 const geni = async (dir) => {
-
-    const test_path = path.resolve(path.join(dir, "../", "../", 'echidna_test'));
+    console.log({ dir });
+    const test_path = path.resolve(path.join(dir, "../", "../", "../", 'echidna_test'));
+    const contract_path = path.resolve(path.join("../", "../", "../", "../", "../", "../", 'contracts'));
 
     const dirFiles = await fse.readdir(dir)
     console.log(`generating solidity test in ${test_path} for contract artifact in  ${dirFiles}`);
@@ -30,7 +31,7 @@ const geni = async (dir) => {
                 const contract = await readArtifact(filePath);
                 if (contract) {
                     const outputPath = `${outputDir}/echidna_${dirName}.sol`
-                    const sourceCode = generateCode(filename, contract, filePath).toString().replace(/},/g, '}');
+                    const sourceCode = generateCode(filename, contract, `${contract_path}/${filename}.sol`).toString().replace(/},/g, '}');
                     console.log({ outputPath, sourceCode });
                     await WriteJsFile(outputPath, sourceCode);
  
@@ -100,10 +101,8 @@ const classTemplate = (contractName, contractPath, prgma,  functions) => {
 // credits : Trail of Bits
 pragma solidity ^0.8.0;
 // import you contract here 
-import "../src/${contractName}.sol";
+import "..${contractPath}";
 
-// this is so helpful but make sure to install forge-test in your cargo.toml
-import "${contractPath}";
 
 // you might need to Moc your token, do it here 
 
