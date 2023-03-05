@@ -8,9 +8,11 @@ Geni is a builder tool that eases the writing of specifications of blockchain sm
 ![Alt text](images/GENI_workflow.png)
 
 
-## Installation
+## installation
+`npm i geni-generator`
+## Run the code 
 
-`npm install`
+`npm install` OR
 `yarn install`
 
 ## Usage
