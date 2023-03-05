@@ -20,7 +20,6 @@ To install Geni, write the following command in your terminal :
 `yarn install`
 
 ## Demo
-Check out the demonstration 
 [Watch the demo video](https://youtu.be/kG54qS-K494)
 ## Deck
 [Check our pitch deck](https://docs.google.com/presentation/d/1yQO7OXldsKcUtCneC81B-d56zAjtq0304gge5fb0WKg/edit?usp=sharing)
@@ -38,11 +37,9 @@ Geni can be run locally as shown in this example :
 1. Hardhat with Echidna 
 2. Foundry
 ### Request options
-Here are the options you need to configure to run the too
+Here are the options you need to configure to run the tool.
 ## Future work
    ![Alt text](images/roadmap.png)
-l.
-
 
 ## Credits
 Many thanks to Chinmay Agrawal, the ETH Denver Community and the Quantstamp team for supporting us in developping this tool.
