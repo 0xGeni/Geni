@@ -1,5 +1,5 @@
 const { Configuration, OpenAIApi } = require("openai");
-process.env.OPENAI_API_KEY = "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";
+process.env.OPENAI_API_KEY = "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"; // Karolina's key, TBC
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
