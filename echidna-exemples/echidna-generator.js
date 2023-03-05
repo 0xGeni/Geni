@@ -19,7 +19,7 @@ const geni = async (dir) => {
     const outputDir = test_path;
     dirFiles.map(async (file) => {
         const filename = path.basename(file, path.extname(file));
-       
+        console.log({ filename, dirName });
         if (filename == dirName) {
 
             console.log(` reading ${dir}/${file} ...`);
@@ -30,8 +30,8 @@ const geni = async (dir) => {
                 const contract = await readArtifact(filePath);
                 if (contract) {
                     const outputPath = `${outputDir}/echidna_${dirName}.sol`
-                    const sourceCode = generateCode(filename,contract).toString().replace(/},/g, '}');
-
+                    const sourceCode = generateCode(filename, contract, filePath).toString().replace(/},/g, '}');
+                    console.log({ outputPath, sourceCode });
                     await WriteJsFile(outputPath, sourceCode);
  
                 }
@@ -75,7 +75,7 @@ const generateCode = (name,contract,  path) => {
 
         }
     });
-    return classTemplate(name,"",  func);
+    return classTemplate(name, path,"",  func);
 
 }
 
@@ -83,6 +83,7 @@ const WriteJsFile = async (path, content) => {
     console.log({ path, content });
     try {
         const obj = await fs.writeFile(path, content, data => console.log('Contract functions are written '))
+       // console.log({ obj });
         return true;
     } catch (error) {
         return false;
@@ -92,7 +93,7 @@ const WriteJsFile = async (path, content) => {
 
 }
 
-const classTemplate = (contractName, prgma,  functions) => {
+const classTemplate = (contractName, contractPath, prgma,  functions) => {
 
     return template = `
     // SPDX-License-Identifier: UNLICENSED
@@ -128,7 +129,7 @@ const funcTemplate = (name) => {
 }
 
 
-geni("./echidna-hh/artifacts/contracts").then(s => {
+geni("./echidna-hh/artifacts/contracts/Lock.sol").then(s => {
      console.log({S:"SSSSSSSSS"});
  })
     module.exports = {
