@@ -6,7 +6,7 @@ var path = require("path");
 
 
 const WriteJsFile = async (path, content) => {
-    console.log({ path, content });
+    // console.log({ path, content });
     try {
         const obj = await fs.writeFile(path, content, data => console.log('Contract functions are written '))
         return true;

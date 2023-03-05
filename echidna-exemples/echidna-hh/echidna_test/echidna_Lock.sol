@@ -19,65 +19,66 @@ contract LockFuzzTest is Lock {
     }
    
 
-function echidna_test_owner() public view returns (bool) {
-    Lock lock = new Lock(block.timestamp + 10);
-    require(lock.owner() == msg.sender, "Owner should be the contract deployer");
+function echidna_test_owner () public view returns (bool) {
+    Lock lock = new Lock(block.timestamp + 500);
+    
+    // Check if owner is correctly set
+    if (lock.owner() != address(this)) {
+        return false;
+    }
+    
+    // Check if withdrawal fails before unlock time
+    try lock.withdraw() {
+        return false;
+    } catch Error(string memory) {
+        // Expected error message.
+    } catch (bytes memory) {
+        return false;
+    }
+    
+    // Check if withdrawal fails for non-owner before unlock time
+    try lock.withdraw{from: address(1234)}() {
+        return false;
+    } catch Error(string memory) {
+        // Expected error message.
+    } catch (bytes memory) {
+        return false;
+    }
+    
+    // Check if withdrawal succeeds after unlock time
+    uint unlockTime = lock.unlockTime();
+    uint timePassed = 0;
+    while (block.timestamp < unlockTime) {
+        timePassed += 1;
+    }
+    try lock.withdraw() {
+        // Expected successful withdrawal.
+    } catch Error(string memory) {
+        return false;
+    } catch (bytes memory) {
+        return false;
+    }
+    
+    // Check if withdrawal fails for non-owner after unlock time
+    try lock.withdraw{from: address(1234)}() {
+        return false;
+    } catch Error(string memory) {
+        // Expected error message.
+    } catch (bytes memory) {
+        return false;
+    }
+    
     return true;
 }
 
 function echidna_test_unlockTime () public view returns (bool) {
-       // Check if unlockTime is set correctly during contract initialization
-       Lock l = new Lock(block.timestamp + 1000);
-       if (l.unlockTime() != block.timestamp + 1000) {
-           return false;
-       }
-
-       // Check if owner can withdraw after unlockTime has passed
-       l = new Lock(block.timestamp + 1);
-       bool success = true;
-       try l.withdraw() {
-           success = false;
-       } catch {}
-
-       if (success) {
-           return false;
-       }
-
-       // Check if non-owner cannot withdraw after unlockTime has passed
-       l = new Lock(block.timestamp + 1);
-       success = true;
-       try l.withdraw{from:accounts[1]}() {
-           success = false;
-       } catch {}
-
-       if (success) {
-           return false;
-       }
-
-       return true;
+    Lock lock = new Lock(block.timestamp + 100); // create new Lock with unlock time 100 seconds in future
+    return lock.unlockTime == block.timestamp + 100; // check that unlock time is set correctly
 }
 
 function echidna_test_withdraw () public view returns (bool) {
-    Lock testLock = new Lock(block.timestamp + 86400);
-    bool success = true;
-    
-    // Test that withdrawal fails before unlock time
-    try testLock.withdraw() {
-        success = false;
-    } catch {}
-    
-    // Test that withdrawal fails if not called by owner
-    try testLock.withdraw{value: 1 wei, gas: 5000}() {
-        success = false;
-    } catch {}
-    
-    // Test that withdrawal succeeds after unlock time and caller is owner
-    try testLock.withdraw{value: 1 wei, gas: 5000, from: address(this)}() {
-        // If we reach this point, withdrawal succeeded
-    } catch {
-        success = false;
-    }
-    
-    return success;
+   Lock lock = new Lock(block.timestamp + 100);
+   lock.withdraw();
+   return true;
 }
 }

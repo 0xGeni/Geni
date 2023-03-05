@@ -8,7 +8,7 @@ const {
 
 
 const serviceGen = async ({ contractsBuildDir, tool,framework }) => {
-    console.log({ contractsBuildDir, tool, framework });
+    // console.log({ contractsBuildDir, tool, framework });
     if (!contractsBuildDir || !tool || !framework) {
         console.error("missing Required params")
         return

@@ -9,7 +9,7 @@ const geni = async (dir) => {
     const basePath = path.resolve(path.join(dir, '../', '../'));
     const outputDir = path.resolve(path.join(basePath, 'test'));
     const contractPath = path.relative(process.cwd(), path.resolve(path.join(basePath, 'src')));
-    console.log({ outputDir, basePath, contractPath });
+    // console.log({ outputDir, basePath, contractPath });
 
     try {
         await fse.ensureDir(outputDir);
