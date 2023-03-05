@@ -3,9 +3,8 @@ const { Configuration, OpenAIApi } = require("openai");
 const fs = require('fs');
 
 async function generateUnitTest(smartContractPath, unitTest) {
-    const openaiApiKey = "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";
 
-//   const openaiApiKey = process.env.OPENAI_API_KEY;
+  const openaiApiKey = process.env.OPENAI_API_KEY;
   const openai = new OpenAIApi(new Configuration({apiKey:openaiApiKey}));
   openai.api_key = openaiApiKey;
   
