@@ -18,35 +18,33 @@ contract TestCounter is Test {
 
    
 
-function testIncrement () public {
+function testIncrement() public {
    Counter counter = new Counter();
-   uint256 initialNumber = counter.number();
+   uint256 initialNumber = 0;
+   uint256 expectedNumber = 1;
+   uint256 actualNumber;
+
+   counter.setNumber(initialNumber);
    counter.increment();
-   uint256 finalNumber = counter.number();
-   Assert.equal(finalNumber, initialNumber + 1, "Number should have incremented by 1");
+   actualNumber = counter.number();
+
+   Assert.equal(actualNumber, expectedNumber, "Increment failed");
 }
 
 function testNumber() public {
     Counter counter = new Counter();
-    uint256 expectedNumber = 10;
+    uint256 expected = 10;
 
-    counter.setNumber(expectedNumber);
-    uint256 actualNumber = counter.number();
+    counter.setNumber(expected);
 
-    assert(actualNumber == expectedNumber);
-
-    counter.increment();
-    expectedNumber++;
-
-    actualNumber = counter.number();
-
-    assert(actualNumber == expectedNumber);
+    assert(counter.number() == expected);
 }
 
 function testSetNumber () public {
-   Counter instance = new Counter();
-   instance.setNumber(5);
-   uint expectedNumber = 5;
-   assert(instance.number() == expectedNumber);
+    Counter counter = new Counter();
+    uint256 expectedNumber = 42;
+    counter.setNumber(expectedNumber);
+    uint256 actualNumber = counter.number();
+    Assert.equal(actualNumber, expectedNumber, "Number should be set correctly");
 }
 }

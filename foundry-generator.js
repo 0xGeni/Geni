@@ -3,7 +3,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const { generateUnitTest } = require('./smart-test.js');
 const { WriteJsFile } = require('./writer.js');
-const { funcTemplate, classTemplate } = require('./foundryTemplate');
+const { funcTemplate, classTemplate } = require('./templates/foundryTemplate');
 
 const geni = async (dir) => {
     const basePath = path.resolve(path.join(dir, '../', '../'));
@@ -94,9 +94,9 @@ const generateCode = async (name,contract,  path) => {
 
 
 
-geni("foundry-examples/hello_foundry/out/Counter.sol/").then(s => {
-     console.log({S:"SSSSSSSSS"});
- })
+// geni("foundry-examples/hello_foundry/out/Counter.sol/").then(s => {
+//      console.log({S:"SSSSSSSSS"});
+//  })
     module.exports = {
          geni
     }

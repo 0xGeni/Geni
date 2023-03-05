@@ -1,69 +1,68 @@
 const fs = require('fs');
 const fse = require('fs-extra');
-var path = require("path");
-const {generateUnitTest}= require('./smart-test.js')
-const {WriteJsFile}= require('./writer.js')
-const { funcTemplate,classTemplate }= require('./echidnaTemplate')
-
+const path = require('path');
+const { generateUnitTest } = require('./smart-test.js');
+const { WriteJsFile } = require('./writer.js');
+const { funcTemplate, classTemplate } = require('./echidnaTemplate');
 
 const geni = async (dir) => {
+    const basePath = path.resolve(path.join(dir, '../', '../', '../'));
+    const outputDir = path.resolve(path.join(basePath, 'echidna_test'));
+    const contractPath = path.relative(process.cwd(), path.resolve(path.join(basePath, 'contracts')));
+    // console.log({ outputDir, basePath, contractPath });
 
-    const basePath = path.resolve(path.join(dir, "../", "../"));
-    const outputDir = path.resolve(path.join(basePath, 'test'));
-    const contract_path = path.resolve(path.join(basePath, 'contracts'));
-
-    const contractPath = path.relative(process.cwd(), contract_path);
-
-    console.log({ outputDir, basePath, contract_path, contractPath });
-    const dirFiles = await fse.readdir(dir)
-    console.log(`generating solidity test in ${outputDir} for contract artifact in  ${dirFiles}`);
-
-    if (!await fse.pathExists(outputDir)) {
-        console.log(`creating  solidity test in  ${outputDir}`);
-
-        await fse.mkdirSync(outputDir)
+    try {
+        await fse.ensureDir(outputDir);
+    } catch (error) {
+        console.error(`Error creating directory: ${outputDir}`, error);
+        throw error;
     }
-    const dirName = path.basename(dir, path.extname(dir));
-    dirFiles.map(async (file) => {
-        const filename = path.basename(file, path.extname(file));
-       
-        if (filename == dirName) {
 
-            console.log(` reading ${dir}/${file} ...`);
+    const dirName = path.basename(dir, path.extname(dir));
+    const dirFiles = await fse.readdir(dir);
+    console.log(`Generating solidity test in ${outputDir} for contract artifact in ${dirFiles}`);
+
+    for (const file of dirFiles) {
+        const filename = path.basename(file, path.extname(file));
+
+        if (filename === dirName) {
+            console.log(`Reading ${dir}/${file}...`);
 
             const filePath = `${dir}/${file}`;
             const stats = fs.lstatSync(filePath);
-            if (stats.isFile()) {
-                const contract = await readArtifact(filePath);
-                if (contract) {
-                     const outputPath = `${outputDir}/${dirName}.sol`
-                     generateCode(filename, contract, `${contractPath}/${filename}.sol`).then(async(data) => {
-                             console.log({ data });
-                        await WriteJsFile(outputPath, data.toString().replace(/},/g, '}'));
-                    })
-                       
-               
- 
-                }
-                else {
-                    console.error(" invalid files");
 
+            if (stats.isFile()) {
+                try {
+                    const contract = await readArtifact(filePath);
+
+                    if (contract) {
+                        const outputPath = `${outputDir}/echidna_${dirName}.sol`
+                        const data = await generateCode(filename, contract, `${contractPath}/${filename}.sol`);
+                        await WriteJsFile(outputPath, data.toString().replace(/},/g, '}'));
+                        console.log(`File written: ${outputPath}`);
+                    } else {
+                        console.error('Invalid contract file:', filePath);
+                    }
+                } catch (error) {
+                    console.error(`Error processing file: ${filePath}`, error);
                 }
             }
-}       
-    })
-}
+        }
+    }
+};
 
 const readArtifact = async (filePath) => {
+    try {
+        const obj = await fse.readJson(filePath, { throws: false });
+        return obj;
+    } catch (error) {
+        console.error(`Error reading JSON file: ${filePath}`, error);
+        throw error;
+    }
+};
 
-    const obj = await fse.readJson(filePath, {
-        throws: false
-    })
 
-    return obj;
-
-}
-const generateCode = async (name,contract,  path) => {
+const generateCode = async (name, contract, path) => {
 
     let func = [];
     // console.log({contract});
@@ -73,21 +72,22 @@ const generateCode = async (name,contract,  path) => {
             let param = item.inputs.map((data) => {
                 return data.name == "" ? "Key" : data.name;
             });
-            const funName = item.name.charAt(0).toUpperCase() + item.name.slice(1);
-            const tempFunc = funcTemplate(funName);
+             const tempFunc = funcTemplate(item.name);
             try {
                 const data = await generateUnitTest(path, tempFunc);
                 return data;
             } catch (error) {
+                console.log({ error });
                 throw new Error("Error Getting Data");
             }
         }
     });
+
     const results = await Promise.all(promises);
+    // console.log({ results });
     const filteredResults = results.filter((item) => item !== undefined);
-    func.push(...filteredResults);
-    const file = classTemplate(name, "", func);
-    console.log({file});
+     func.push(...filteredResults);
+     const file = classTemplate(name, path, "", func);
     return file
 
 }
@@ -95,9 +95,9 @@ const generateCode = async (name,contract,  path) => {
 
 
 
-geni("echidna-exemples/echidna-hh/artifacts/contracts/Lock.sol").then(s => {
-     console.log({S:"SSSSSSSSS"});
- })
-    module.exports = {
-         geni
-    }
+geni("echidna-exemples/echidna-hh/artifacts/contracts/Lock.sol/").then(s => {
+    console.log({ S: "SSSSSSSSS" });
+})
+module.exports = {
+    geni
+}
