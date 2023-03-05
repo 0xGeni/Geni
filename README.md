@@ -1,6 +1,12 @@
-# Geni, the specifications generator for security tests
+![Alt text](images/GENI_logo.png)
 
-Geni is a builder tool that ease the writing of specifications of blockchain smart contracts. These specifications are required to run several auditing services like Foundry or Echidna.
+
+# Geni, the specifications' generator for security tests
+
+Geni is a builder tool that eases the writing of specifications of blockchain smart contracts. These specifications are required to run several auditing services like Foundry or Echidna.
+
+![Alt text](images/GENI_workflow.png)
+
 
 ## Installation
 
