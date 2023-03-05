@@ -5,7 +5,7 @@ const classTemplate = (contractName, contractPath, prgma, functions) => {
 // credits : Trail of Bits
 pragma solidity ^0.8.0;
 // import you contract here 
-import "..${contractPath}";
+import "../contracts/${contractName}.sol";
 
 
 // you might need to Moc your token, do it here 

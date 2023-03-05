@@ -3,7 +3,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const { generateUnitTest } = require('./smart-test.js');
 const { WriteJsFile } = require('./writer.js');
-const { funcTemplate, classTemplate } = require('./echidnaTemplate');
+const { funcTemplate, classTemplate } = require('./templates/echidnaTemplate');
 
 const geni = async (dir) => {
     const basePath = path.resolve(path.join(dir, '../', '../', '../'));
@@ -20,7 +20,7 @@ const geni = async (dir) => {
 
     const dirName = path.basename(dir, path.extname(dir));
     const dirFiles = await fse.readdir(dir);
-    console.log(`Generating solidity test in ${outputDir} for contract artifact in ${dirFiles}`);
+    console.log(`Generating solidity test in ${outputDir} for contract artifact in ${dir}`);
 
     for (const file of dirFiles) {
         const filename = path.basename(file, path.extname(file));
@@ -95,9 +95,9 @@ const generateCode = async (name, contract, path) => {
 
 
 
-geni("echidna-exemples/echidna-hh/artifacts/contracts/Lock.sol/").then(s => {
-    console.log({ S: "SSSSSSSSS" });
-})
+// geni("echidna-exemples/echidna-hh/artifacts/contracts/Lock.sol/").then(s => {
+//     console.log({ S: "SSSSSSSSS" });
+// })
 module.exports = {
     geni
 }

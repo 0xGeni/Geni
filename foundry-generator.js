@@ -20,7 +20,7 @@ const geni = async (dir) => {
 
     const dirName = path.basename(dir, path.extname(dir));
     const dirFiles = await fse.readdir(dir);
-    console.log(`Generating solidity test in ${outputDir} for contract artifact in ${dirFiles}`);
+    console.log(`Generating solidity test in ${outputDir} for contract artifact in ${dir}`);
 
     for (const file of dirFiles) {
         const filename = path.basename(file, path.extname(file));
@@ -62,11 +62,11 @@ const readArtifact = async (filePath) => {
 };
 
 
-const generateCode = async (name,contract,  path) => {
+const generateCode = async (name, contract, path) => {
 
     let func = [];
     // console.log({contract});
-    // console.log(contract.abi,"contract.abi");
+    console.log(path,"contract.abi");
     const promises = contract?.abi?.map(async (item) => {
         if (item.type == "function") {
             let param = item.inputs.map((data) => {
@@ -86,7 +86,7 @@ const generateCode = async (name,contract,  path) => {
     const filteredResults = results.filter((item) => item !== undefined);
     func.push(...filteredResults);
     const file = classTemplate(name, "", func);
-    console.log({file});
+     console.log({file});
     return file
 
 }
@@ -97,6 +97,6 @@ const generateCode = async (name,contract,  path) => {
 // geni("foundry-examples/hello_foundry/out/Counter.sol/").then(s => {
 //      console.log({S:"SSSSSSSSS"});
 //  })
-    module.exports = {
-         geni
-    }
+module.exports = {
+    geni
+}
