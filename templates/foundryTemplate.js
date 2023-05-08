@@ -1,5 +1,4 @@
 const classTemplate = (contractName, prgma, functions) => {
-  console.log({ contractName, prgma, functions });
     return template = `
 pragma solidity ^0.8.0;
 // import you contract here 

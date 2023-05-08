@@ -1,25 +1,23 @@
 {
-  "name": "geni-generator",
+   "name": "geni-generator",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
-  "bin": {
-    "geni/generate": "./bin/geni-cli",
-    "geni": "../bin/geni-cli"
-  },
-  "author": "",
+     "author": "",
   "license": "ISC",
   "dependencies": {
-    "arg": "^5.0.2",
-    "dotenv": "^16.0.3",
-    "fs-extra": "^11.1.0",
-    "openai": "^3.2.1",
+    "chalk": "^2.4.1",
+    "esm": "^3.2.25",
+    "figlet": "^1.2.0",
+    "inquirer": "^6.0.0",
+  "openai": "^3.2.1",
     "request": "^2.88.2"
   },
-  "devDependencies": {
-    "esm": "^3.2.25"
+  "bin": {
+    "geni": "./index.js"
   }
 }

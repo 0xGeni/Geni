@@ -1,6 +1,5 @@
 const fs = require('fs');
-const fse = require('fs-extra');
-var path = require("path");
+const chalk = require("chalk");
 
 
 
@@ -8,7 +7,16 @@ var path = require("path");
 const WriteJsFile = async (path, content) => {
     // console.log({ path, content });
     try {
-        const obj = await fs.writeFile(path, content, data => console.log('Contract functions are written '))
+        const obj = await fs.writeFile(path, content, data => console.log(
+            chalk.yellow(
+                figlet.textSync("Contract functions are written", {
+                    font:"threepoint",
+                horizontalLayout: "default",
+                verticalLayout: "default"
+                })
+        )));
+            
+            
         return true;
     } catch (error) {
         return false;
