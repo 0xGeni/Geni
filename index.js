@@ -37,18 +37,21 @@ const init = () => {
 
 const success = filepath => {
     console.log(
-        chalk.white.bgGreen.bold(`Done! File created at ${filepath}`)
+        chalk.green.bold(`Done! File created at ${filepath}`)
     );
 };
 
 const run = async () => {
     // show script introduction
+    console.log(
+        chalk.yellow.bold(`Done! File created at `)
+    );
     init();
 // collect data 
     // ask questions
     const answers = await askQuestions();
     const { FRAMEWORK, TOOL, OUTPUTPATH, INPUTPATH, ISAIBASED } = answers;
-    console.log({ FRAMEWORK, TOOL, OUTPUTPATH, INPUTPATH, ISAIBASED });
+    // console.log({ FRAMEWORK, TOOL, OUTPUTPATH, INPUTPATH, ISAIBASED });
     if (ISAIBASED) {
         const answers = await askQuestionsForAI();
         const { FRAMEWORK, CONTRACTPATH } = answers;
@@ -56,7 +59,6 @@ const run = async () => {
         if (FRAMEWORK === "chatGPT") {
             const answers = await askQuestionsForChatGPT();
             const { GPTKEY } = answers;
-            console.log({ GPTKEY });
             const files = await getContractFile(INPUTPATH, OUTPUTPATH);
             files.map(async (file) => {
                 const { filePath, filename, outputPath } = file;
@@ -64,9 +66,9 @@ const run = async () => {
                     //  inuputFile, filename
                     const data = await generateGPTFuz(filePath, filename, CONTRACTPATH, GPTKEY );
                     await WriteJsFile(outputPath, data.toString().replace(/},/g, '}'));
-                    console.log(`File written: ${outputPath}`);
+                    console.log(chalk.green(`File written: ${outputPath}`));
                 } catch (error) {
-                    console.error(`Error processing file: ${filePath}`, error);
+                    console.error(chalk.red.bold(`Error processing file: ${filePath}`, error));
                 }
             }
             );
@@ -75,13 +77,14 @@ const run = async () => {
         const files = await getContractFile(INPUTPATH, OUTPUTPATH);
         files.map(async (file) => {
             const { filePath, filename, outputPath } = file;
-            try {
+             try {
                 //  inuputFile, filename
                 const data = await generateUnitTest(filePath, filename);
                 await WriteJsFile(outputPath, data.toString().replace(/},/g, '}'));
-                console.log(`File written: ${outputPath}`);
             } catch (error) {
-                console.error(`Error processing file: ${filePath}`, error);
+                console.error(
+                    chalk.red.bold(
+                    `Error processing file: ${filePath}`, error));
             }
         }
         );
@@ -93,39 +96,33 @@ const run = async () => {
     // write 
      //success(filePath);
 };
-
-
-function generateAiBasedEchidnaFuzz(inputPath,outputDir,aiModel,aiKey) {
-    
-}
-function generateAiBasedFoundryFuzz(inputPath,outputDir,aiModel,aiKey) {
-    
-}
 // get contract file from directory
 const getContractFile = async (inputPath, outputDir) => {
 
-    let result = [{}];
-    // const dirName = path.basename(inputPath, path.extname(inputPath));
-
-    const dirFiles = await fse.readdir(inputPath);
-    console.log(`Generating solidity test in ${outputDir} for contract artifact in ${inputPath}`);
+    let result=[];
+    const dirName = path.basename(inputPath, path.extname(inputPath));
+     const dirFiles = await fse.readdir(inputPath);
+    console.log(chalk.yellow.bold(`Generating solidity test in ${outputDir} for contract artifact in ${inputPath}`));
     for (const file of dirFiles) {
         const filename = path.basename(file, path.extname(file));
-        console.log({ filename });
+           if (filename === dirName) {
+               console.log(chalk.cyan(`Reading ${inputPath}/${file}...`));
 
-        console.log(`Reading ${inputPath}/${file}...`);
+            const filePath = `${inputPath}/${file}`;
+            const stats = fs.lstatSync(filePath);
 
-        const filePath = `${inputPath}/${file}`;
-        const stats = fs.lstatSync(filePath);
-
-        if (stats.isFile()) {
-            const outputPath = `${outputDir}/${filename}.sol`;
-               let data = { filePath, filename, outputPath };
+            if (stats.isFile()) {
+                const outputPath = `${outputDir}/${filename}.sol`;
+                let data = { filePath, filename, outputPath };
                 result.push(data);
+            }
         }
     }
     return result;
 
 
 }
+// getContractFile("./artifacts/contracts/Project.sol", "./test").then((result) => {
+//     console.log({ result });
+// });
 run();

@@ -22,8 +22,7 @@ const generateUnitTest = async ( inuputFile, filename) => {
    
     try {
         const contract = await readArtifact(inuputFile);
-
-        if (contract) {
+         if (contract) {
             return await generateBasicTestCode(filename, contract);
         } else {
             console.error('Invalid contract file:', inuputFile);
@@ -63,9 +62,8 @@ const generateGPTCode = async (name, contract, path, openaiApiKey) => {
             }
         }
     });
-    const results = await Promise.all(promises);
-    const filteredResults = results.filter((item) => item !== undefined);
-    func.push(...filteredResults);
+    const results = (await Promise.all(promises)).filter((item) => item !== undefined);
+    func.push(...results);
     const file = classTemplate(name, "", func);
     return file
 
@@ -82,7 +80,7 @@ const generateBasicTestCode = async (name, contract) => {
             return funcTemplate(funName);
 
         }
-    });
+    }).filter((item) => item !== undefined);
     const file = classTemplate(name, "", func);
     return file
 

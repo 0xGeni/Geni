@@ -5,7 +5,8 @@
 
 # testing
 /coverage
-
+/contracts
+/artifacts
 # production
 /build
 

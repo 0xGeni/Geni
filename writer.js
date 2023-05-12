@@ -8,14 +8,10 @@ const figlet = require("figlet");
 const WriteJsFile = async (path, content) => {
     // console.log({ path, content });
     try {
-        const obj = await fs.writeFile(path, content, data => console.log(
-            chalk.yellow(
-                figlet.textSync("Contract functions are written", {
-                    font:"threepoint",
-                horizontalLayout: "default",
-                verticalLayout: "default"
-                })
-        )));
+        const obj = await fs.writeFile(path, content, data =>
+            console.log(
+                chalk.yellow.bold(`Contract functions are written at :  ${path}`)
+            ));
             
             
         return true;
