@@ -4,13 +4,13 @@ const askQuestions = () => {
     const questions = [
 
         {
-            name: "TOOL",
+            name: "TYPE",
             type: "list",
             message: "What do you want to generate?",
-            choices: ["fuzz Test"
-                , "unit test"
-                , "formal verification"
-                , "symbolic execution"],
+            choices: ["Fuzz Test"
+                , "Unit Test"
+                , "Formal Verification"
+                , "Symbolic Execution"],
 
 
         },
@@ -18,37 +18,20 @@ const askQuestions = () => {
             name: "FRAMEWORK",
             type: "list",
             message: "What is the framework you want to use?",
-            choices: ["foundry"
-                , "echedna"],
-
-
-
-
+            choices: ["Foundry"
+                , "Hardhat","Others"],
         },
         {
-            name: "INPUTPATH",
-            type: "input",
-            message: "Where is your ABI files? ( folder path )",
-            validate: async function (value) {
-                if (value.length) {
-                    try {
-                        // get the direcroty of a given file 
-                        
-                        await fse.ensureDir(value);
-                        return true;
-                    } catch (error) {
-                        console.log(error);
-                        return "Please enter the path of your ABI files.";
-                    }
-
-                } else {
-                    return "Please enter the path of your ABI files.";
-                }
-            }
-        }, {
+            name: "TOOL",
+            type: "list",
+            message: "What is the framework you want to use?",
+            choices: ["Foundry"
+                , "Echedna","Others"],
+        },
+     {
             name: "OUTPUTPATH",
             type: "input",
-            message: "where do you want to generate the file?",
+            message: "Where do you want to generate the file?",
             validate:  async function (value) {
                 if (value.length) {
                     try {
@@ -75,6 +58,18 @@ const askQuestions = () => {
     return inquirer.prompt(questions);
 };
 const askQuestionsForAI = () => {
+    const questions = [        {
+            name: "AIFRAMEWORK",
+            type: "list",
+            message: "What is the framework you want to use?",
+            choices: ["chatGPT",
+                "openAI"],
+
+        }
+    ];
+    return inquirer.prompt(questions);
+};
+const askQuestionsForAINunSupportedSolidityFramework = () => {
     const questions = [{
         name: "CONTRACTPATH",
         type: "input",
@@ -92,15 +87,7 @@ const askQuestionsForAI = () => {
                 return "Please enter the path of the solidity contract file exists.";
             }
         }
-    },
-        {
-            name: "FRAMEWORK",
-            type: "list",
-            message: "What is the framework you want to use?",
-            choices: ["chatGPT",
-                "openAI"],
-
-        }
+    }
     ];
     return inquirer.prompt(questions);
 };
@@ -114,10 +101,35 @@ const askQuestionsForChatGPT = () => {
     ];
     return inquirer.prompt(questions);
 };
+const askQuestionsForNonSupportedFramework = () => {
+    const questions = [
+        {
+            name: "INPUTPATH",
+            type: "input",
+            message: "Where is your ABI files? ( folder path )",
+            validate: async function (value) {
+                if (value.length) {
+                    try {
+                        // get the direcroty of a given file 
 
+                        await fse.ensureDir(value);
+                        return true;
+                    } catch (error) {
+                        console.log(error);
+                        return "Please enter the path of your ABI files.";
+                    }
+
+                } else {
+                    return "Please enter the path of your ABI files.";
+                }
+            }
+        }];
+    return inquirer.prompt(questions);
+};
 module.exports = {
     askQuestions,
     askQuestionsForAI,
-    askQuestionsForChatGPT
-    
+    askQuestionsForChatGPT,
+    askQuestionsForNonSupportedFramework,
+    askQuestionsForAINunSupportedSolidityFramework
 }
