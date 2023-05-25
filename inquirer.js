@@ -9,8 +9,9 @@ const askQuestions = () => {
             message: "What do you want to generate?",
             choices: ["Fuzz Test"
                 , "Unit Test"
-                , "Formal Verification"
-                , "Symbolic Execution"],
+                // , "Formal Verification"
+                // , "Symbolic Execution"
+            ],
 
 
         },
@@ -26,7 +27,7 @@ const askQuestions = () => {
             type: "list",
             message: "What is the framework you want to use?",
             choices: ["Foundry"
-                , "Echedna","Others"],
+                , "Echidna","Others"],
         },
      {
             name: "OUTPUTPATH",

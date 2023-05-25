@@ -5,7 +5,7 @@ const path = require("path");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const { WriteJsFile } = require("./writer.js");
-const { generateGPTFuz, generateUnitTest } = require("./tools/foundry.fuzz.js");
+const { generateGPTFuz, generateUnitTest, generateNonAIFuz } = require("./tools/fuzz.js");
 const {
   askQuestions,
   askQuestionsForAI,
@@ -52,7 +52,7 @@ const run = async () => {
       TOOL: "",
       TYPE:"",
     OUTPUTPATH: "",
-    INPUTPATH: "./contracts",
+    INPUTPATH: "",
     ISAIBASED: false,
     AIFRAMEWORK: "",
     CONTRACTPATH: "./contracts",
@@ -70,12 +70,15 @@ const run = async () => {
   inquirerAnswers.OUTPUTPATH = answers1.OUTPUTPATH;
   inquirerAnswers.INPUTPATH = answers1.INPUTPATH;
   inquirerAnswers.ISAIBASED = answers1.ISAIBASED;
-  if (inquirerAnswers.FRAMEWORK === "Others") {
+  if (inquirerAnswers.FRAMEWORK === "Hardhat") {
+    inquirerAnswers.INPUTPATH = "./artifacts/contracts";
+  } else if (inquirerAnswers.FRAMEWORK === "Foundry") {
+    inquirerAnswers.CONTRACTPATH = "./src";
+    inquirerAnswers.INPUTPATH = "./out";
+  } else {
     const path = await askQuestionsForNonSupportedFramework();
     inquirerAnswers.INPUTPATH = path.INPUTPATH;
-  } else {
-    inquirerAnswers.INPUTPATH = "./contracts";
-  }
+  } 
     if (inquirerAnswers.ISAIBASED) {
         const answers2 = await askQuestionsForAI();
         if (inquirerAnswers.FRAMEWORK === "Others") {
@@ -83,31 +86,36 @@ const run = async () => {
             inquirerAnswers.CONTRACTPATH = answers3.CONTRACTPATH;
         }
         inquirerAnswers.AIFRAMEWORK = answers2.AIFRAMEWORK;
-        inquirerAnswers.CONTRACTPATH = answers2.CONTRACTPATH;
         if (inquirerAnswers.AIFRAMEWORK === "chatGPT") {
             const answers4 = await askQuestionsForChatGPT();
             const { GPTKEY } = answers4;
             inquirerAnswers.GPTKEY = answers4.GPTKEY;
         }
-    }
-    const files = await getContractFile(inquirerAnswers.INPUTPATH, inquirerAnswers. OUTPUTPATH);
+  }
+  //console.log(inquirerAnswers.INPUTPATH, inquirerAnswers.OUTPUTPATH, "inquirerAnswers.INPUTPATH, inquirerAnswers. OUTPUTPATH");
+  const files = inquirerAnswers.FRAMEWORK === "Others" ? await getContractFile(inquirerAnswers.INPUTPATH, inquirerAnswers.OUTPUTPATH, inquirerAnswers.TOOL)
+    : await getContractFileForSupportedFrameworks(inquirerAnswers.CONTRACTPATH, inquirerAnswers.OUTPUTPATH, inquirerAnswers.INPUTPATH, inquirerAnswers.TOOL)
 // first we need to know what user wants to do , fuz, unit test or what?
     // then we need to know the tools
     // then we need to know if user wants smart result using AI
-    files.map(async (file) => {
-        const { filePath, filename, outputPath } = file;
+  files.map(async (file) => {
+     
+        let { filePath, filename, outputPath } = file;
         let data;
         if (inquirerAnswers.TYPE == "Fuzz Test") {
-            if (inquirerAnswers.TOOL == "Echedna") {
+         
                 if (inquirerAnswers.ISAIBASED) {
                     if (inquirerAnswers.AIFRAMEWORK === "chatGPT") {
                        
-                            try {// should update it with echidna 
+                      try {// should update it with echidna 
+                              ///     console.log({ contractPath, inuputFile, filename, openaiApiKey, tool },"generateGPTFuz");
+
                                  data = await generateGPTFuz(
                                     filePath,
                                     filename,
                                     inquirerAnswers.CONTRACTPATH,
-                                    inquirerAnswers.GPTKEY
+                                   inquirerAnswers.GPTKEY,
+                                   inquirerAnswers.TOOL
                                 );
                                    } catch (error) {
                                 console.error(
@@ -122,32 +130,16 @@ const run = async () => {
                 } else {
                     // to be updated later on
                     try {
-                        data = await generateUnitTest(filePath, filename);
+                      data = await generateNonAIFuz(filePath, filename, inquirerAnswers.TOOL);
                     } catch (error) {
                         console.error(
                             chalk.red.bold(`Error processing file: ${filePath}`, error)
                         );
                     }
                 }
-            } else if (inquirerAnswers.TOOL == "Foundry") {
-                try {
-                    data = await generateGPTFuz(
-                        filePath,
-                        filename,
-                        inquirerAnswers.CONTRACTPATH,
-                        inquirerAnswers.GPTKEY
-                    );
-                } catch (error) {
-                    console.error(
-                        chalk.red.bold(`Error processing file: ${filePath}`, error)
-                    );
-                }
-            } else {
-                nonSupportedMsg();
-                return;
-            }
-        
-        } else if (inquirerAnswers.TYPE == "Unit Test") {
+         
+        }
+         else if (inquirerAnswers.TYPE == "Unit Test") {
             try {
                 data = await generateUnitTest(filePath, filename);
             } catch (error) {
@@ -180,7 +172,7 @@ const run = async () => {
   //success(filePath);
 };
 // get contract file from directory
-const getContractFile = async (inputPath, outputDir) => {
+const getContractFile = async (inputPath, outputDir,tool) => {
   let result = [];
   const dirName = path.basename(inputPath, path.extname(inputPath));
   const dirFiles = await fse.readdir(inputPath);
@@ -191,6 +183,7 @@ const getContractFile = async (inputPath, outputDir) => {
   );
   for (const file of dirFiles) {
     const filename = path.basename(file, path.extname(file));
+    // console.log({ filename });
     if (filename === dirName) {
       console.log(chalk.cyan(`Reading ${inputPath}/${file}...`));
 
@@ -198,11 +191,40 @@ const getContractFile = async (inputPath, outputDir) => {
       const stats = fs.lstatSync(filePath);
 
       if (stats.isFile()) {
-        const outputPath = `${outputDir}/${filename}.sol`;
+        const outputPath = tool === "Echidna" ? `${outputDir}/echidna_${filename}.sol` :
+          `${outputDir}/${filename}.sol`;
         let data = { filePath, filename, outputPath };
         result.push(data);
       }
     }
+  }
+  return result;
+};
+const getContractFileForSupportedFrameworks = async (contractsPath, outputDir,artifactsPath,tool) => {
+  console.log({ contractsPath, outputDir, artifactsPath, tool },"xxx");
+  let result = [];
+  const dirFiles = await fse.readdir(contractsPath);
+  console.log(
+    chalk.yellow.bold(
+      `Generating solidity test in ${outputDir} for contract in ${contractsPath}`
+    )
+  );
+  for (const file of dirFiles) {
+    const filename = path.basename(file, path.extname(file));
+    
+      console.log(chalk.cyan(`Reading ${contractsPath}/${file}...`));
+
+      const contractFile = `${contractsPath}/${file}`;
+      const stats = fs.lstatSync(contractFile);
+
+      if (stats.isFile()) {
+        const filePath = `${artifactsPath}/${filename}.sol/${filename}.json`;
+        const outputPath = tool === "Echidna" ? `${outputDir}/echidna_${filename}.sol` :
+          `${outputDir}/${filename}.sol`;
+         let data = { filePath, filename, outputPath };
+        result.push(data);
+      }
+    
   }
   return result;
 };

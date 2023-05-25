@@ -1,11 +1,11 @@
-const classTemplate = (contractName, contractPath, prgma, functions) => {
-
+const classTemplate = (contractName, functions, pragma = "^0.8.0", contractPath ="../contracts/") => {
+/**contractName, prgma, functions */
   return template = `
     // SPDX-License-Identifier: UNLICENSED
 // credits : Trail of Bits
-pragma solidity ^0.8.0;
+pragma solidity ${pragma};
 // import you contract here 
-import "../contracts/${contractName}.sol";
+import "${contractPath}${contractName}.sol";
 
 
 // you might need to Moc your token, do it here 
